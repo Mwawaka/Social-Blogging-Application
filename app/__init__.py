@@ -21,4 +21,7 @@ def create_app(config_name):
     mail.init_app(app)
     moment.init_app(app)
     
+    #Registering the main blueprint
+    from main import main as main_bp
+    app.register_blueprint(main_bp)
     return app
