@@ -1,11 +1,10 @@
-
 import os
 from app import db,create_app
-from flask_script import Shell,Manager
+from flask.cli import FlaskGroup
 
 
 app=create_app(os.environ.get('FLASK_CONFIG') or 'default')
-manager=Manager(app)
+cli=FlaskGroup(app)
 
 
 def make_shell_context():

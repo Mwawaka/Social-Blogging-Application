@@ -1,12 +1,13 @@
-from distutils.command.config import config
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 from flask_mail import Mail
 from flask_moment import Moment
 
+from config import config
 db=SQLAlchemy()
 mail=Mail()
 moment=Moment()
+
 
 # Factory Function
 
@@ -20,6 +21,7 @@ def create_app(config_name):
     db.init_app(app)
     mail.init_app(app)
     moment.init_app(app)
+    
     
     #Registering the main blueprint
     from main import main as main_bp
