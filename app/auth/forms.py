@@ -1,5 +1,4 @@
 from email import message
-from tkinter import Label
 from flask_wtf import  FlaskForm
 from wtforms import StringField,PasswordField,EmailField,BooleanField,SubmitField
 from wtforms.validators import DataRequired,Length,EqualTo,Email
