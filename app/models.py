@@ -4,7 +4,7 @@ from app import db
 
 
 class User(db.Model):
-    __tablename__='users'
+    __tablename__='user'
     id=db.Column(db.Integer(),primary_key=True)
     username=db.Column(db.String(30),nullable=False,unique=True,index=True)
     email=db.Column(db.String(60),nullable=False,unique=True,index=True)
@@ -17,7 +17,7 @@ class User(db.Model):
 class Role(db.Model):
     __tablename__='roles'
     id=db.Column(db.Integer(),primary_key=True)
-    name=db.Column(db.String(30,nullable=False,unique=True))
+    name=db.Column(db.String(30),nullable=False,unique=True)
     users=db.relationship('User',backref='role',lazy=True)
     
     def __repr__(self):
