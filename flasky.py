@@ -1,19 +1,14 @@
 import os
 from app import db,create_app
-from flask.cli import FlaskGroup
-
 
 app=create_app(os.environ.get('FLASK_CONFIG') or 'default')
-cli=FlaskGroup(app)
 
-
+@app.shell_context_processor
 def make_shell_context():
-    return dict(app=app,db=db)
-manager.add_command('shell',Shell(make_context=make_shell_context))
+    return dict(db=db)
 
-
-if __name__=='main':
-    manager.run()
+if __name__=='__main__':
+    app.run()
     
     
     
