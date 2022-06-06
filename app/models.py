@@ -4,12 +4,12 @@ from app import db
 
 
 class User(db.Model):
-    __tablename__='user'
+    __tablename__='users'
     id=db.Column(db.Integer(),primary_key=True)
     username=db.Column(db.String(30),nullable=False,unique=True,index=True)
     email=db.Column(db.String(60),nullable=False,unique=True,index=True)
     password_hash=db.Column(db.String(128),nullable=False)
-    role_id=db.Column(db.Integer(),db.ForeignKey('role.id'))
+    role_id=db.Column(db.Integer(),db.ForeignKey('roles.id'))
 
     def __repr__(self):
         return f'User {self.username}'
