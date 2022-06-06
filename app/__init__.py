@@ -28,3 +28,4 @@ def create_app(config_name):
     from app.main import main as main_bp
     app.register_blueprint(main_bp)
     return app
+
