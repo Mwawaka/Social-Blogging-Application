@@ -17,15 +17,19 @@ def create_app(config_name):
     # from_object() method ensures that the configurations in the config.py can be imported directly into the application
     app.config.from_object(config[config_name])
 
-    config[config_name].init_app(app) 
-    #.init_app() ensures complete initializtion of the extensions declared above
+    config[config_name].init_app(app)
+    # .init_app() ensures complete initializtion of the extensions declared above
 
     db.init_app(app)
     mail.init_app(app)
     moment.init_app(app)
 
     # Registering the main blueprint
+
     from app.main import main as main_bp
     app.register_blueprint(main_bp)
-    return app
 
+    from app.auth import auth as auth_bp
+    app.register_blueprint(auth_bp)
+
+    return app
