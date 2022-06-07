@@ -1,4 +1,3 @@
-from cmath import log
 from flask import flash, redirect, render_template, url_for
 from flask_login import login_user
 from requests import request
@@ -38,6 +37,8 @@ def login():
         ).first()
         if user and user.verify_password(login_password=login_form.login_password.data):
             login_user(user, login_form.remember_me)
+            
+            flash(f'You have successfull signed in as :{user.username}')
             next = request.args.get('next')
             # the original url protected from unauthorized access is stored in next query string
             if next is None or not next.startswith('/'):
@@ -45,6 +46,6 @@ def login():
                 next = url_for('main.index')
                 # if next query string is not available user is then redirected to the home page
             return redirect(next)
-        flash(f'You have successfull signed in as :{user.username}')
+        flash(f'Invalid email or password',category='danger')
 
     return render_template('auth/login.html', login_form=login_form)
