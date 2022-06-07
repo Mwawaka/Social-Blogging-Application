@@ -2,9 +2,9 @@ Dear{{}},
 
 Welcome to Blogvolution!
 
-To confirm your account please click on the following link
+To confirm your account please click on the following link:
 
-{{}}
+
 
 Sincerely,
 
