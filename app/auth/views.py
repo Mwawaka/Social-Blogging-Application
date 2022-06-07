@@ -17,5 +17,5 @@ def register():
 
 @auth.route('/login',methods=['GET','POST'])
 def login():
-    login_form=LoginForm
+    login_form=LoginForm()
     return render_template('auth/login.html',login_form=login_form)
