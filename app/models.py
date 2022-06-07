@@ -14,10 +14,10 @@ def load_user(user_id):
 class User(db.Model,UserMixin):
     __tablename__ = 'users'
     id = db.Column(db.Integer(), primary_key=True)
-    username = db.Column(db.String(30), nullable=False,
+    username = db.Column(db.String(length=30), nullable=False,
                          unique=True, index=True)
-    email = db.Column(db.String(60), nullable=False, unique=True, index=True)
-    password_hash = db.Column(db.String(128), nullable=False)
+    email = db.Column(db.String(length=60), nullable=False, unique=True, index=True)
+    password_hash = db.Column(db.String(length=128), nullable=False)
     role_id = db.Column(db.Integer(), db.ForeignKey('roles.id'))
     
     #Password encryption
