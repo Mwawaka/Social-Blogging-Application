@@ -18,7 +18,7 @@ def register():
         )
         db.session.add(new_user)
         db.session.commit()
-        send_email('Confirm Your Account','auth/email/confirm',new_user.email)
+        send_email(new_user.email,'Confirm Your Account','auth/email/confirm',new_user=new_user)
         flash('A confirmation email has been sent to you by email')
         # flash('Successfully registered.You can now Sign In!', category='success')
         return redirect(url_for('auth.login'))
