@@ -17,12 +17,13 @@ def register():
         )
         db.session.add(new_user)
         db.session.commit()
-        flash('Successfully registered.You can now Sign In!', category='info')
-        redirect(url_for('auth/login'))
+        flash('Successfully registered.You can now Sign In!', category='success')
+        return redirect(url_for('auth/login'))
     if form.errors != {}:
         for err_msg in form.errors.values():
             flash(
                 f'There was an error in creating an account: {err_msg}', category='danger')
+            
     return render_template('auth/register.html', form=form)
 
 
