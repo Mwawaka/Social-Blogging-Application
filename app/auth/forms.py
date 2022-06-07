@@ -1,4 +1,3 @@
-from email import message
 from flask_wtf import  FlaskForm
 from wtforms import StringField,PasswordField,EmailField,BooleanField,SubmitField
 from wtforms.validators import DataRequired,Length,EqualTo,Email
@@ -9,3 +8,7 @@ class RegistrationForm(FlaskForm):
     password1=PasswordField(label='Password :')
     password2=PasswordField(label=' Password :',validators=[DataRequired(),EqualTo(password1)])
     submit=SubmitField(label='Register')
+    
+class LoginForm(FlaskForm):
+    email=EmailField(label='Email Address :',validators=[DataRequired(),Email()])
+    login_password=PasswordField(validators=[DataRequired()])
