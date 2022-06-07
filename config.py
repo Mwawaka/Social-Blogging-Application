@@ -9,8 +9,8 @@ class Config:
 
     MAIL_SERVER = 'smtp.mailtrap.io'
     MAIL_PORT = '2525'
-    MAIL_USERNAME = os.environ.get('MAIL_USERNAME')
-    MAIL_PASSWORD = os.environ.get('MAIL_PASSWORD')
+    MAIL_USERNAME = 'b1e36004efd6b6'#os.environ.get('MAIL_USERNAME')
+    MAIL_PASSWORD = 'dc831ef795b6d8'#os.environ.get('MAIL_PASSWORD')
     MAIL_USE_TLS = True
     MAIL_USE_SSL = False
     FLASKY_MAIL_SUBJECT_PREFIX = ['Blogvolution']
