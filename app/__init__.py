@@ -5,12 +5,15 @@ from flask_mail import Mail
 from flask_moment import Moment
 from config import config
 from flask_bcrypt import Bcrypt
+from flask_login import LoginManager
 
 db = SQLAlchemy()
 mail = Mail()
 moment = Moment()
 bcrypt=Bcrypt()
-
+login_manager=LoginManager()
+#login_view attribute sets the end point for the login page .Flask will redirect to the login page when anonymous user tries to access a protected page 
+login_manager.login_view='auth.login'
 
 # Factory Function
 
@@ -27,6 +30,7 @@ def create_app(config_name):
     mail.init_app(app)
     moment.init_app(app)
     bcrypt.init_app(app)
+    login_manager.init_app(app)
 
     # Registering the main blueprint
 
