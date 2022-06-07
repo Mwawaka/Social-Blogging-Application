@@ -1,10 +1,10 @@
 from flask import flash, redirect, render_template, url_for
 from flask_login import login_required, login_user, logout_user
-from requests import request
 from app.auth import auth
 from .forms import LoginForm, RegistrationForm
 from app.models import User
 from app import db
+from app.emails import send_email
 
 
 @auth.route('/register', methods=['GET', 'POST'])
@@ -18,7 +18,9 @@ def register():
         )
         db.session.add(new_user)
         db.session.commit()
-        flash('Successfully registered.You can now Sign In!', category='success')
+        send_email('Confirm Your Account','auth/email/confirm',new_user.email)
+        flash('A confirmation email has been sent to you by email')
+        # flash('Successfully registered.You can now Sign In!', category='success')
         return redirect(url_for('auth.login'))
     if form.errors != {}:
         for err_msg in form.errors.values():
