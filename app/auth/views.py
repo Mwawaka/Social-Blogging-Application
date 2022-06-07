@@ -25,7 +25,7 @@ def register():
             flash(
                 f'There was an error in creating an account: {err_msg}', category='danger')
 
-    return render_template('auth.register.html', form=form)
+    return render_template('auth/register.html', form=form)
 
 
 @auth.route('/login', methods=['GET', 'POST'])
