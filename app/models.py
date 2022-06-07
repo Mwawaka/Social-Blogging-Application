@@ -1,6 +1,8 @@
+from email.policy import default
 from app import db,bcrypt
 from flask_login import UserMixin
 from app import login_manager
+from flask import current_app
 
 
 
@@ -19,6 +21,7 @@ class User(db.Model,UserMixin):
     email = db.Column(db.String(length=60), nullable=False, unique=True, index=True)
     password_hash = db.Column(db.String(length=128), nullable=False)
     role_id = db.Column(db.Integer(), db.ForeignKey('roles.id'))
+    confirmed=db.Column(db.Boolean(),default=False)
     
     #Password encryption
     @property
