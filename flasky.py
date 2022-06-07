@@ -3,6 +3,7 @@ from app import db,create_app
 from app.models import User,Role
 
 
+
 app=create_app(os.getenv('FLASK_CONFIG') or 'default')
 
 @app.shell_context_processor
