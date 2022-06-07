@@ -15,7 +15,7 @@ class User(db.Model):
     def password(self):
         #Prevent reading password
         raise AttributeError('Password is not readable')
-        return self.password
+        # return self.password
     
     @password.setter
     def password(self,plain_text_password):
