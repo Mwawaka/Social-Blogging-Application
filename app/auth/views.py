@@ -5,4 +5,4 @@ from .forms import RegistrationForm
 @auth.route('/register',methods=['GET','POST'])
 def register():
     form=RegistrationForm()
-    return render_template('auth/registration.html',form=form)
+    return render_template('auth/register.html',form=form)
