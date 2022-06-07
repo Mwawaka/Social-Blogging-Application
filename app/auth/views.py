@@ -1,5 +1,5 @@
 from flask import flash, redirect, render_template, url_for
-from flask_login import login_user
+from flask_login import login_required, login_user, logout_user
 from requests import request
 from app.auth import auth
 from .forms import LoginForm, RegistrationForm
@@ -38,14 +38,22 @@ def login():
         if user and user.verify_password(login_password=login_form.login_password.data):
             login_user(user, login_form.remember_me)
             
-            flash(f'You have successfull signed in as :{user.username}')
-            next = request.args.get('next')
-            # the original url protected from unauthorized access is stored in next query string
-            if next is None or not next.startswith('/'):
-                # The URL in next is validated to make sure it is a relative URL
-                next = url_for('main.index')
-                # if next query string is not available user is then redirected to the home page
-            return redirect(next)
+            flash(f'You have successfull signed in as :{user.username}',category='success')
+            # next = request.args.get('next')
+            # # the original url protected from unauthorized access is stored in next query string
+            # if next is None or not next.startswith('/'):
+            #     # The URL in next is validated to make sure it is a relative URL
+            #     next = url_for('main.index')
+            #     # if next query string is not available user is then redirected to the home page
+            return redirect(url_for('main.index'))
         flash(f'Invalid email or password',category='danger')
 
     return render_template('auth/login.html', login_form=login_form)
+
+@auth.route('/logout')
+@login_required
+def logout():
+    logout_user()
+    flash('You have been Signed Out!',category='info')
+    return redirect(url_for('auth.login'))
+    
