@@ -1,0 +1,32 @@
+{% extends 'base.html' %}
+
+{% block title %}
+    |Registration Page
+{% endblock title %}
+
+{% block content %}
+    
+        <div class='text-center'>
+            <form>
+              {{form.hidden_tag()}}
+
+                <div class="mb-3">
+                    {{form.username.label()}}
+                    {{form.username(class='form-control',placeholder='Username')}}
+
+                    {{form.email.label()}}
+                    {{form.email(class='form-control',placeholder='Email Address')}}
+              
+                  <div id="emailHelp" class="form-text">We'll never share your email with anyone else.</div>
+                </div>
+                {{form.password1.label()}}
+                {{form.password1(class='form-control',placeholder='New Password')}}
+
+                {{form.password2.label()}}
+                {{form.password2(class='form-control',placeholder='Confirm Password')}}
+                <br>
+              {{form.submit(class="btn btn-primary")}}
+              </form>
+        </div>
+    
+{% endblock content %}
