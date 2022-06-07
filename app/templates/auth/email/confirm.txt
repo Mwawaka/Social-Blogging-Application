@@ -1,0 +1,13 @@
+Dear{{}},
+
+Welcome to Blogvolution!
+
+To confirm your account please click on the following link
+
+{{}}
+
+Sincerely,
+
+The Blogvolution Team
+
+Note:replies to this email are not monitored.
