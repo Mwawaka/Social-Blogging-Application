@@ -1,5 +1,15 @@
 from app import db,bcrypt
 from flask_login import UserMixin
+from app import login_manager
+
+
+
+# This sets the callback for reloading a user from the session. The function you set should take a user ID (a str) and return a user object, or None if the user does not exist
+@login_manager.user_loader
+def load_user(user_id):
+    return User.query.get(int(user_id))
+
+
 
 class User(db.Model,UserMixin):
     __tablename__ = 'users'
