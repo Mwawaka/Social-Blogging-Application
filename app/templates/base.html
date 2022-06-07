@@ -18,7 +18,7 @@
             color:whitesmoke;
         }
     </style> -->
-   
+
 </head>
 
 <body>
@@ -39,11 +39,11 @@
                         <a class="nav-link" href="{{url_for('auth.logout')}}">Sign out</a>
                     </li>
                     {% else %}
-                        <li class="nav-item">
-                            <a class="nav-link" href="{{url_for('auth.login')}}">Sign in</a>
-                        </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{url_for('auth.login')}}">Sign in</a>
+                    </li>
                     {% endif %}
-                   
+
                     <li class="nav-item">
                         <a class="nav-link" href="{{url_for('auth.register')}}">Registration</a>
                     </li>
@@ -56,16 +56,16 @@
     </nav>
     {% with messages=get_flashed_messages(with_categories=true)%}
         {% if messages %}
-            {% for category,message in messages  %}
+            {% for category,message in messages %}
                 <div class="alert alert-{{ category }}">
-                    <button type="button" class="m1-2 mb-1 close" data-dismiss="alert" aria-label="Close">
+                    <button type="button" class="m1-2 mb-1 close" data-dismiss="alert"  aria-label="Close">
                         <span aria-hidden="true">&times;</span>
                     </button>
                     {{ message }}
                 </div>
             {% endfor %}
-    {% else %}
-    {% endif %}
+
+        {% endif %}
 
     {% endwith %}
     {% block content %}
