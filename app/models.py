@@ -13,11 +13,17 @@ class User(db.Model):
     #Password encryption
     @property
     def password(self):
+        #Prevent reading password
+        raise AttributeError('Password is not readable')
         return self.password
     
-    @property.setter
+    @password.setter
     def password(self,plain_text_password):
         self.password_hash=bcrypt.generate_password_hash(plain_text_password).decode('utf-8')
+        
+    # Password verification
+    def verify_password(self,login_password):
+        return bcrypt.check_password_hash(self.password_hash,login_password)
 
     def __repr__(self):
         return f'User {self.username}'
