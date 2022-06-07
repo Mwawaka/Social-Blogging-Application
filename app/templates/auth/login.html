@@ -18,14 +18,18 @@
 
             {{login_form.login_password.label()}}
             {{login_form.login_password(class='form-control',placeholder='Password')}}
+           
             <br>
             {{login_form.remember_me}}
             {{login_form.remember_me.label()}}
-            
         </div>
-
         <br>
-        {{login_form.submit(class="btn btn-primary")}}
+        <div class="checkbox mb-3">
+            <h6>Don't have an account?</h6>
+            <a href="{{url_for('auth.register')}}" class="btn btn-sm btn-secondary">Create Account</a>
+          </div>
+          <br>
+            {{login_form.submit(class="btn btn-primary")}}
     </form>
 </div>
 {% endblock content %}
