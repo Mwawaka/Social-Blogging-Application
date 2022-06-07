@@ -1,12 +1,15 @@
+import bcrypt
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 from flask_mail import Mail
 from flask_moment import Moment
 from config import config
+from flask_bcrypt import Bcrypt
 
 db = SQLAlchemy()
 mail = Mail()
 moment = Moment()
+bcrypt=Bcrypt()
 
 
 # Factory Function
@@ -23,6 +26,7 @@ def create_app(config_name):
     db.init_app(app)
     mail.init_app(app)
     moment.init_app(app)
+    bcrypt.init_app(app)
 
     # Registering the main blueprint
 
