@@ -18,12 +18,17 @@
       {{form.email(class='form-control',placeholder='Email Address')}}
 
       <div id="emailHelp" class="form-text">We'll never share your email with anyone else.</div>
-    </div>
-    {{form.password1.label()}}
-    {{form.password1(class='form-control',placeholder='New Password')}}
+      {{form.password1.label()}}
+      {{form.password1(class='form-control',placeholder='New Password')}}
 
-    {{form.password2.label()}}
-    {{form.password2(class='form-control',placeholder='Confirm Password')}}
+      {{form.password2.label()}}
+      {{form.password2(class='form-control',placeholder='Confirm Password')}}
+    </div>
+    
+    <div class="checkbox mb-3">
+      <h6>Already have an account?</h6>
+      <a href="{{url_for('auth.login')}}" class="btn btn-sm btn-secondary">Sign In</a>
+    </div>
     <br>
     {{form.submit(class="btn btn-primary")}}
   </form>
