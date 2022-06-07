@@ -1,4 +1,3 @@
-import email
 from flask import flash, redirect, render_template, url_for
 from app.auth import auth
 from .forms import LoginForm, RegistrationForm
