@@ -1,7 +1,7 @@
 import email
 from flask import render_template
 from app.auth import auth
-from .forms import RegistrationForm
+from .forms import LoginForm, RegistrationForm
 from app.models import User
 from app import db
 
@@ -14,3 +14,8 @@ def register():
         db.session.add(new_user)
         db.session.commit()
     return render_template('auth/register.html',form=form)
+
+@auth.route('/login',methods=['GET','POST'])
+def login():
+    login_form=LoginForm
+    return render_template('auth/login.html',login_form=login_form)
