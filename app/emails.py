@@ -11,6 +11,5 @@ def send_email(to, subject,template, **kwargs):
      )
     msg.body=render_template(template+'.txt',**kwargs)
     msg.html=render_template(template+'.html',**kwargs)
-    
-    mail.send(msg, template_name='auth/email.html')
+    mail.send(msg)
     return jsonify(status_code=200, content={"message": "Email has been sent."})
