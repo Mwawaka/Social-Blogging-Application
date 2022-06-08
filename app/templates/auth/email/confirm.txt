@@ -1,4 +1,4 @@
-Dear{{new_user}},
+Dear {{new_user}},
 
 Welcome to Blogvolution!
 
