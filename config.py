@@ -14,7 +14,7 @@ class Config:
     MAIL_USE_TLS = True
     MAIL_USE_SSL = False
     FLASKY_MAIL_SUBJECT_PREFIX = ['Blogvolution']
-    FLASKY_MAIL_SENDER = os.environ.get('FLASKY_MAIL_SENDER')
+    MAIL_FROM = os.environ.get('MAIL_FROM')
     FLASKY_ADMIN = os.environ.get('FLASKY_ADMIN')
     SQLALCHEMY_TRACK_MODIFICATIONS = False
 
