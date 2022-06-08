@@ -57,7 +57,12 @@ def login():
 def confirm(token):
     if current_user.confirmed:
         return redirect(url_for('main.index'))
-
+    if current_user.confirm(token):
+        db.session.commit()
+        flash('You have successfully confirmed your account',category='success')
+    else:
+        flash('The confirmation link is invalid or has expired')
+    return redirect(url_for('main.index'))
 @auth.route('/logout')
 @login_required
 def logout():
