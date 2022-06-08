@@ -1,6 +1,6 @@
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
-from flask_mailing import Mail
+from flask_mail import Mail
 from flask_moment import Moment
 from config import config
 from flask_bcrypt import Bcrypt
