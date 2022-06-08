@@ -51,7 +51,7 @@ class User(db.Model,UserMixin):
             app.config['SECRET KEY']
         )
         return token
-    def confirm(self,token):
+    def confirm_token(self,token):
         app=current_app._get_current_object()
         try:
              payload=jwt.decode(token,app.config['SECRET_KEY'])
