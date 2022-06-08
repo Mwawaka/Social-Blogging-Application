@@ -8,7 +8,7 @@ class Config:
     SECRET_KEY = os.environ.get('SECRET_KEY')
 
     MAIL_SERVER = 'smtp.mailtrap.io'
-    MAIL_PORT = '2525'
+    MAIL_PORT = 2525
     MAIL_USERNAME = 'b1e36004efd6b6'#os.environ.get('MAIL_USERNAME')
     MAIL_PASSWORD = 'dc831ef795b6d8'#os.environ.get('MAIL_PASSWORD')
     MAIL_USE_TLS = True
