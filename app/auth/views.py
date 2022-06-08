@@ -63,7 +63,7 @@ def confirm(token):
         flash('You have successfully confirmed your account',category='success')
     else:
         flash('The confirmation link is invalid or has expired')
-    return redirect(url_for('main.index'))
+    return redirect(url_for('main.landing'))
 @auth.route('/logout')
 @login_required
 def logout():
