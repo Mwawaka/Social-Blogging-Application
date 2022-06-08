@@ -18,7 +18,8 @@ def register():
         )
         db.session.add(new_user)
         db.session.commit()
-        send_email(new_user.email,'Confirm Your Account','auth/email/confirm',new_user=new_user)
+        token=new_user.generate_confirmation_token()
+        send_email(new_user.email,'Confirm Your Account','auth/email/confirm',new_user=new_user,token=token)
         flash('A confirmation email has been sent to you by email',category='info')
         # flash('Successfully registered.You can now Sign In!', category='success')
         return redirect(url_for('auth.login'))
@@ -57,7 +58,7 @@ def login():
 def confirm(token):
     if current_user.confirmed:
         return redirect(url_for('main.index'))
-    if current_user.confirm(token):
+    if current_user.confirm_token(token):
         db.session.commit()
         flash('You have successfully confirmed your account',category='success')
     else:
