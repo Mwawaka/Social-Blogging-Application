@@ -1,5 +1,5 @@
 from flask import flash, redirect, render_template, url_for
-from flask_login import login_required, login_user, logout_user
+from flask_login import current_user, login_required, login_user, logout_user
 from app.auth import auth
 from .forms import LoginForm, RegistrationForm
 from app.models import User
@@ -51,6 +51,12 @@ def login():
         flash(f'Invalid email or password',category='danger')
 
     return render_template('auth/login.html', login_form=login_form)
+
+@auth.route('/confirm/<token>')
+@login_required
+def confirm(token):
+    if current_user.confirmed:
+        return redirect(url_for('main.index'))
 
 @auth.route('/logout')
 @login_required
