@@ -46,9 +46,9 @@ class User(db.Model,UserMixin):
         token=jwt.encode(
             {
                 'confirm':self.id,
-                'expiration':datetime.utcnow()+timedelta(minutes=5)
+                'expiration':str(datetime.utcnow()+timedelta(minutes=5))
             },
-            app.config['SECRET KEY']
+            app.config['SECRET_KEY']
         )
         return token
     def confirm_token(self,token):
