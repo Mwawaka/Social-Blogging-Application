@@ -3,6 +3,8 @@ from app import db,bcrypt
 from flask_login import UserMixin
 from app import login_manager
 from flask import current_app
+import jwt
+from datetime import datetime,timedelta
 
 
 
@@ -38,6 +40,29 @@ class User(db.Model,UserMixin):
     def verify_password(self,login_password):
         return bcrypt.check_password_hash(self.password_hash,login_password)
 
+    #Token authorization
+    def generate_confirmation_token(self):
+        app=current_app._get_current_object()
+        token=jwt.encode(
+            {
+                'confirm':self.id,
+                'expiration':datetime.utcnow()+timedelta(minutes=5)
+            },
+            app.config['SECRET KEY']
+        )
+        return token
+    def confirm(self,token):
+        app=current_app._get_current_object()
+        try:
+             payload=jwt.decode(token,app.config['SECRET_KEY'])
+        except :
+            return False
+        if payload.get('confirm')!=self.id:
+            return False
+        self.confirmed=True
+        db.session.add(self)
+        return True
+       
     def __repr__(self):
         return f'User {self.username}'
 
