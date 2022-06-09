@@ -1,7 +1,7 @@
 from app import db,bcrypt
 from flask_login import UserMixin
 from app import login_manager
-from flask import current_app
+from flask import current_app, jsonify
 import jwt
 from datetime import datetime,timedelta
 
@@ -45,7 +45,7 @@ class User(db.Model,UserMixin):
         token=jwt.encode(
             {
                 'confirm':self.id,
-                'expiration':str(datetime.utcnow()+timedelta(minutes=5))
+                'expiration':str(datetime.now()+timedelta(minutes=2))
             },
             app.config['SECRET_KEY']
         )
@@ -56,7 +56,7 @@ class User(db.Model,UserMixin):
         try:
             payload=jwt.decode(token,app.config['SECRET_KEY'])
         except :
-            return False
+            return jsonify({'Alert':'Invalid Token'})
         return payload
        
     def __repr__(self):
