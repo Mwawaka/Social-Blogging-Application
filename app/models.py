@@ -1,10 +1,9 @@
+from flask import current_app
 from app import db,bcrypt
 from flask_login import UserMixin
 from app import login_manager
-from flask import current_app, jsonify
-import jwt
 from datetime import datetime,timedelta
-
+from itsdangerous import URLSafeTimedSerializer as Serializer
 
 
 # This sets the callback for reloading a user from the session. The function you set should take a user ID (a str) and return a user object, or None if the user does not exist
@@ -39,25 +38,22 @@ class User(db.Model,UserMixin):
     def verify_password(self,login_password):
         return bcrypt.check_password_hash(self.password_hash,login_password)
 
-    #Token authorization
     def generate_confirmation_token(self):
-        app=current_app._get_current_object()
-        token=jwt.encode(
-            {
-                'confirm':self.id,
-                'expiration':str(datetime.now()+timedelta(minutes=2))
-            },
-            app.config['SECRET_KEY']
-        )
-        return token
+        s=Serializer(current_app.config['SECRET_KEY'])
+        return s.dumps({'confirm':self.id},salt=current_app.config['SECURITY_PASSWORD_SALT'])
     
-    def confirm_token(self,token):
-        app=current_app._get_current_object()
+    def confirm_token(token,expiration=3600):
+        s=Serializer(current_app.config['SECRET_KEY'])
         try:
-            payload=jwt.decode(token,app.config['SECRET_KEY'])
-        except :
-            return jsonify({'Alert':'Invalid Token'})
-        return payload
+            data=s.loads(
+                token,
+                salt=current_app.config['SECURITY_PASSWORD_KEY'],
+                max_age=expiration
+            )
+        except:
+            return False
+        return data
+        
        
     def __repr__(self):
         return f'User {self.username}'
