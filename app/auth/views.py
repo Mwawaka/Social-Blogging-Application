@@ -17,6 +17,7 @@ def register():
             username=form.username.data,
             email=form.email.data,
             password=form.password1.data
+            
         )
         db.session.add(new_user)
         db.session.commit()
@@ -57,29 +58,13 @@ def login():
 
     return render_template('auth/login.html', login_form=login_form)
 
-def token_required(f):
-    @wraps(f)
-    def decorated(*args, **kwargs):
-        token=request.args.get('token')
-        if not token:
-            return flash('Token is missing!',category='danger')
-        try:
-            data=jwt.decode(token,current_app.config['SECRET_KEY'])
-            new_user=User.query.filter_by(id=data.confirm)
-            new_user.confirmed==True
-            db.session.add(new_user)
-            db.session.commit()
-        except:
-            return flash('Token is Invalid',category='danger')
-        return f(*args, **kwargs)
-    return decorated
+
 
 @auth.route('/confirm',methods=['GET','POST'])
 @login_required
-@token_required
+
 def confirm():
-    # if current_user.confirmed:
-    #     return redirect(url_for('main.landing'))
+    flash('You have successfully confirmed your email account')
     return redirect(url_for('main.landing'))
     
 @auth.route('/logout')
