@@ -1,4 +1,4 @@
-from flask import current_app, flash, redirect, render_template, url_for,request
+from flask import current_app, flash, jsonify, redirect, render_template, url_for, request
 from flask_login import current_user, login_required, login_user, logout_user
 import jwt
 from pyparsing import wraps
@@ -17,7 +17,7 @@ def register():
             username=form.username.data,
             email=form.email.data,
             password=form.password1.data
-            
+
         )
         db.session.add(new_user)
         db.session.commit()
@@ -34,22 +34,29 @@ def register():
 
     return render_template('auth/register.html', form=form)
 
-@auth.route('/confirm/<token>')
+
+@auth.route('/confirm/<token>',methods=['GET','POST'])
 @login_required
 def confirm(token):
     try:
-         data=current_user.confirm_token(token)
+        data = current_user.confirm_token(token)
+        if data.get('confirm')!=current_user.id:
+            flash('The confirmation link is invalid or expired!', category='danger')
+        else:
+             current_user.confirmed = True
+             db.session.add(current_user)
+             db.session.commit()
+             flash('You have successfully confirmed your account', category='success')
+             return redirect(url_for('main.landing'))
     except:
-        flash('The confirmation link is invalid or expired!',category='danger')
+        flash('The confirmation link is invalid or expired!', category='danger')
     if current_user.confirmed:
-        flash('Account is already confirmed.',category='success')
-        return redirect('main.landing')
-    else:
-        current_user.confirmed=True
-        db.session.add(current_user)
-        db.session.commit()
-        flash('You have successfully confirmed your account',category='success')
-    return redirect(url_for('main.landing'))
+       return flash('Account is already confirmed.', category='success')
+       
+       
+    return redirect(url_for('main.index'))
+
+
 @auth.route('/login', methods=['GET', 'POST'])
 def login():
     login_form = LoginForm()
@@ -72,7 +79,8 @@ def login():
         flash(f'Invalid email or password', category='danger')
 
     return render_template('auth/login.html', login_form=login_form)
-    
+
+
 @auth.route('/logout')
 @login_required
 def logout():
