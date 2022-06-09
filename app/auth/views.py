@@ -1,13 +1,21 @@
 from flask import current_app, flash, jsonify, redirect, render_template, url_for, request
 from flask_login import current_user, login_required, login_user, logout_user
-import jwt
-from pyparsing import wraps
 from app.auth import auth
 from .forms import LoginForm, RegistrationForm
 from app.models import User
 from app import db
 from app.emails import send_email
 
+@auth.before_app_request
+def before_request():
+    if current_user.is_authenticated and not current_user.confirmed and request.blueprint!='auth' and request.endpoint!='static':
+        return redirect(url_for('auth.unconfirmed'))
+    
+@auth.route('/unconfirmed')
+def unconfirmed():
+    if current_user.is_anonymous or current_user.confirmed:
+        return redirect(url_for('main.landing'))
+    return render_template('auth/unconfirmed.html')
 
 @auth.route('/register', methods=['GET', 'POST'])
 def register():
