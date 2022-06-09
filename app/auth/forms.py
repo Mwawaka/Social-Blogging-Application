@@ -22,3 +22,8 @@ class LoginForm(FlaskForm):
         label='Password :', validators=[DataRequired()])
     remember_me = BooleanField(label='Keep me signed in')
     submit = SubmitField(label='Sign In')
+    
+class ChangePassword(FlaskForm):
+    old_password=PasswordField(label='Current Password :',validators=[DataRequired()])
+    new_password=PasswordField(label='New Password',validators=[DataRequired(),Length(min=6)])
+    submit=SubmitField(label='Change Password')
