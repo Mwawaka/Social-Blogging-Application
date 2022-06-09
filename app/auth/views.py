@@ -63,7 +63,14 @@ def confirm(token):
         flash('Successfully confirmed your account', category='success')
         return redirect(url_for('main.landing'))
     
-
+@auth.route('/confirm')
+@login_required
+def resend_confirmation_email():
+    token=current_user.generate_confirmation_token()
+    send_email(current_user.email, 'Confirm Your Account',
+                   'auth/email/confirm', new_user=current_user, token=token)
+    flash('A new confirmation email has been sent to you by email', category='info')
+    return redirect(url_for('main.index'))
 
 @auth.route('/login', methods=['GET', 'POST'])
 def login():
