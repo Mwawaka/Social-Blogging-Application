@@ -1,7 +1,7 @@
 from flask import current_app, flash, jsonify, redirect, render_template, url_for, request
 from flask_login import current_user, login_required, login_user, logout_user
 from app.auth import auth
-from .forms import LoginForm, RegistrationForm
+from .forms import ChangePassword, LoginForm, RegistrationForm
 from app.models import User
 from app import db
 from app.emails import send_email
@@ -11,13 +11,16 @@ from app.emails import send_email
 def before_request():
     if current_user.is_authenticated and not current_user.confirmed and request.blueprint!='auth' and request.endpoint!='static':
         return redirect(url_for('auth.unconfirmed'))
-    
+ 
+#Deals with users who have not confirmed their accounts   
 @auth.route('/unconfirmed')
 def unconfirmed():
     if current_user.is_anonymous or current_user.confirmed:
         return redirect(url_for('main.landing'))
     return render_template('auth/unconfirmed.html')
 
+
+#Registration
 @auth.route('/register', methods=['GET', 'POST'])
 def register():
     form = RegistrationForm()
@@ -43,7 +46,7 @@ def register():
 
     return render_template('auth/register.html', form=form)
 
-
+#Email that contains confirmation link
 @auth.route('/confirm/<token>', methods=['GET', 'POST'])
 @login_required
 def confirm(token):
@@ -62,7 +65,8 @@ def confirm(token):
         db.session.commit()
         flash('Successfully confirmed your account', category='success')
         return redirect(url_for('main.landing'))
-    
+
+#Resending confirmation email    
 @auth.route('/confirm')
 @login_required
 def resend_confirmation_email():
@@ -72,6 +76,8 @@ def resend_confirmation_email():
     flash('A new confirmation email has been sent to you by email', category='info')
     return redirect(url_for('main.index'))
 
+
+#Login 
 @auth.route('/login', methods=['GET', 'POST'])
 def login():
     login_form = LoginForm()
@@ -94,8 +100,12 @@ def login():
         flash(f'Invalid email or password', category='danger')
 
     return render_template('auth/login.html', login_form=login_form)
-
-
+#Changing password
+@auth.route('/change_password')
+def change_password():
+    change_password=ChangePassword()
+    return render_template('auth/change_password.html',change_password=change_password)
+#login out
 @auth.route('/logout')
 @login_required
 def logout():
