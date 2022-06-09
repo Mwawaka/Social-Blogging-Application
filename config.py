@@ -6,7 +6,7 @@ basedir = os.path.abspath(os.path.dirname(__file__))
 class Config:
     # retrieves the secret_key set in the environment variable
     SECRET_KEY = os.environ.get('SECRET_KEY')
-
+    SECURITY_PASSWORD_SALT=os.environ.get('SECURITY_PASSWORD_SALT')
     MAIL_SERVER = 'smtp.mailtrap.io'
     MAIL_PORT = 2525
     MAIL_USERNAME = '1e1c60de022d37'#os.environ.get('MAIL_USERNAME')
