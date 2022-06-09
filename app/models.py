@@ -39,10 +39,11 @@ class User(db.Model,UserMixin):
         return bcrypt.check_password_hash(self.password_hash,login_password)
 
     # Token authentication using URLSafeTimedSerializer
+    #Generates the token
     def generate_confirmation_token(self):
         s=Serializer(current_app.config['SECRET_KEY'])
         return s.dumps({'confirm':self.id},salt=current_app.config['SECURITY_PASSWORD_SALT'])
-    
+    #Confirms the token
     def confirm_token(token,expiration=3600):
         s=Serializer(current_app.config['SECRET_KEY'])
         try:
