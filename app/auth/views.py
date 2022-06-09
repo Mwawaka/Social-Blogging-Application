@@ -1,5 +1,9 @@
-from flask import flash, redirect, render_template, url_for
+from ast import arg
+from textwrap import wrap
+from flask import current_app, flash, redirect, render_template, url_for
 from flask_login import current_user, login_required, login_user, logout_user
+import jwt
+from requests import request
 from app.auth import auth
 from .forms import LoginForm, RegistrationForm
 from app.models import User
@@ -18,9 +22,10 @@ def register():
         )
         db.session.add(new_user)
         db.session.commit()
-        token=new_user.generate_confirmation_token()
-        send_email(new_user.email,'Confirm Your Account','auth/email/confirm',new_user=new_user,token=token)
-        flash('A confirmation email has been sent to you by email',category='info')
+        token = new_user.generate_confirmation_token()
+        send_email(new_user.email, 'Confirm Your Account',
+                   'auth/email/confirm', new_user=new_user, token=token)
+        flash('A confirmation email has been sent to you by email', category='info')
         # flash('Successfully registered.You can now Sign In!', category='success')
         return redirect(url_for('auth.login'))
     if form.errors != {}:
@@ -40,8 +45,9 @@ def login():
         ).first()
         if user and user.verify_password(login_password=login_form.login_password.data):
             login_user(user, login_form.remember_me)
-            
-            flash(f'You have successfull signed in as :{user.username}',category='success')
+
+            flash(
+                f'You have successfull signed in as :{user.username}', category='success')
             # next = request.args.get('next')
             # # the original url protected from unauthorized access is stored in next query string
             # if next is None or not next.startswith('/'):
@@ -49,20 +55,40 @@ def login():
             #     next = url_for('main.index')
             #     # if next query string is not available user is then redirected to the home page
             return redirect(url_for('main.index'))
-        flash(f'Invalid email or password',category='danger')
+        flash(f'Invalid email or password', category='danger')
 
     return render_template('auth/login.html', login_form=login_form)
 
-@auth.route('/confirm/<token>')
+
+def confirm_token(func):
+    @wrap(func)
+    def decorated(*args, **kwargs):
+        app = current_app._._get_current_object()
+        token = request.args.get('token')
+        if not token:
+            return current_user.confirmed == False
+        try:
+            payload = jwt.decode(token, app.config['SECRET_KEY'])
+            return payload
+        except :
+            return flash('Invalid token or token has already expired',category='danger')
+        return func(*args, **kwargs)
+    return decorated
+            
+@auth.route('/confirm')
 @login_required
-def confirm(token):
+@confirm_token
+def confirm(payload):
     if current_user.confirmed:
         return redirect(url_for('main.index'))
-    if current_user.confirm_token(token):
-        db.session.commit()
-        flash('You have successfully confirmed your account',category='success')
+    if payload.get('confirm')!=current_user.id:
+                return current_user.confirmed==False
     else:
-        flash('The confirmation link is invalid or has expired')
+        current_user.confirmed==True
+        db.session.add(current_user)
+        db.session.commit()
+        flash('You have successfully confirmed your account',category='success')            
+        return redirect(url_for('main.index'))
     return redirect(url_for('main.landing'))
 @auth.route('/logout')
 @login_required
