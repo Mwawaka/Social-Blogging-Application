@@ -22,7 +22,7 @@ class User(db.Model,UserMixin):
     email = db.Column(db.String(length=60), nullable=False, unique=True, index=True)
     password_hash = db.Column(db.String(length=128), nullable=False)
     role_id = db.Column(db.Integer(), db.ForeignKey('roles.id'))
-    confirmed=db.Column(db.Boolean(),default=False)
+    confirmed=db.Column(db.Boolean(),nullable=False,default=False)
     
     #Password encryption
     @property
