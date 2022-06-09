@@ -51,18 +51,13 @@ class User(db.Model,UserMixin):
         )
         return token
     
-    # def confirm_token(self,token):
-    #     app=current_app._get_current_object()
-    #     try:
-    #             payload=jwt.decode(token,app.config['SECRET_KEY'])
-    #             if payload.get('confirm')!=self.id:
-    #                 return False
-    #             self.confirmed=True
-    #             db.session.add(self)
-    #             return True
-    #     except :
-    #         return False
-       
+    def confirm_token(self,token):
+        app=current_app._get_current_object()
+        try:
+            payload=jwt.decode(token,app.config['SECRET_KEY'])
+        except :
+            return False
+        return payload
        
     def __repr__(self):
         return f'User {self.username}'
