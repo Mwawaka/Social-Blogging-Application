@@ -34,7 +34,22 @@ def register():
 
     return render_template('auth/register.html', form=form)
 
-
+@auth.route('/confirm/<token>')
+@login_required
+def confirm(token):
+    try:
+         data=current_user.confirm_token(token)
+    except:
+        flash('The confirmation link is invalid or expired!',category='danger')
+    if current_user.confirmed:
+        flash('Account is already confirmed.',category='success')
+        return redirect('main.landing')
+    else:
+        current_user.confirmed=True
+        db.session.add(current_user)
+        db.session.commit()
+        flash('You have successfully confirmed your account',category='success')
+    return redirect(url_for('main.landing'))
 @auth.route('/login', methods=['GET', 'POST'])
 def login():
     login_form = LoginForm()
@@ -57,15 +72,6 @@ def login():
         flash(f'Invalid email or password', category='danger')
 
     return render_template('auth/login.html', login_form=login_form)
-
-
-
-@auth.route('/confirm',methods=['GET','POST'])
-@login_required
-
-def confirm():
-    flash('You have successfully confirmed your email account')
-    return redirect(url_for('main.landing'))
     
 @auth.route('/logout')
 @login_required
