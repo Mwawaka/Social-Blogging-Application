@@ -78,8 +78,8 @@ def token_required(f):
 @login_required
 @token_required
 def confirm():
-    if current_user.confirmed:
-        return redirect(url_for('main.landing'))
+    # if current_user.confirmed:
+    #     return redirect(url_for('main.landing'))
     return redirect(url_for('main.landing'))
     
 @auth.route('/logout')
