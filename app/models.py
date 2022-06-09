@@ -42,7 +42,7 @@ class User(db.Model,UserMixin):
         s=Serializer(current_app.config['SECRET_KEY'])
         return s.dumps({'confirm':self.id},salt=current_app.config['SECURITY_PASSWORD_SALT'])
     
-    def confirm_token(token,expiration=3600):
+    def confirm_token(token,expiration=600):
         s=Serializer(current_app.config['SECRET_KEY'])
         try:
             data=s.loads(
