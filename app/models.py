@@ -1,8 +1,7 @@
-from email.policy import default
 from app import db,bcrypt
 from flask_login import UserMixin
 from app import login_manager
-from flask import current_app, jsonify
+from flask import current_app
 import jwt
 from datetime import datetime,timedelta
 
@@ -51,7 +50,7 @@ class User(db.Model,UserMixin):
             app.config['SECRET_KEY']
         )
         return token
-   
+    
     # def confirm_token(self,token):
     #     app=current_app._get_current_object()
     #     try:
