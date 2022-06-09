@@ -39,21 +39,19 @@ def register():
 @login_required
 def confirm(token):
     try:
-        data = current_user.confirm_token(token)
+        data=current_user.confirm_token(token)
         if data.get('confirm')!=current_user.id:
-            flash('The confirmation link is invalid or expired!', category='danger')
-        else:
-             current_user.confirmed = True
-             db.session.add(current_user)
-             db.session.commit()
-             flash('You have successfully confirmed your account', category='success')
-             return redirect(url_for('main.landing'))
+             flash('The confirmation link is invalid or has expired',category='danger')
     except:
-        flash('The confirmation link is invalid or expired!', category='danger')
+        flash('The confirmation link is invalid or has expired',category='danger')
     if current_user.confirmed:
-       return flash('Account is already confirmed.', category='success')
-       
-       
+        flash('Account has already been confirmed',category='info')
+        return redirect(url_for('main.landing'))
+    else:
+        current_user.confirmed=True
+        db.session.add(current_user)
+        db.session.commit()
+        flash('Successfully confirmed your account')
     return redirect(url_for('main.index'))
 
 
