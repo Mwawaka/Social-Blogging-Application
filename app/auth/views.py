@@ -1,9 +1,7 @@
-from ast import arg
-from textwrap import wrap
-from flask import current_app, flash, redirect, render_template, url_for
+from flask import current_app, flash, redirect, render_template, url_for,request
 from flask_login import current_user, login_required, login_user, logout_user
 import jwt
-from requests import request
+from pyparsing import wraps
 from app.auth import auth
 from .forms import LoginForm, RegistrationForm
 from app.models import User
@@ -60,40 +58,41 @@ def login():
     return render_template('auth/login.html', login_form=login_form)
 
 
-def confirm_token(func):
-    @wrap(func)
-    def decorated(*args, **kwargs):
-        app = current_app._._get_current_object()
-        token = request.args.get('token')
-        if not token:
-            return current_user.confirmed == False
-        try:
-            payload = jwt.decode(token, app.config['SECRET_KEY'])
-            return payload
-        except :
-            return flash('Invalid token or token has already expired',category='danger')
-        return func(*args, **kwargs)
-    return decorated
-            
-@auth.route('/confirm')
+def confirmation_token():
+    def token_required(f):
+        @wraps(f)
+        def decorated(*args, **kwargs):
+            token = request.args.get('token')
+            if not token:
+                return flash('Token is Missing', category='danger')
+            try:
+                payload = jwt.decode(token, current_app.config['SECRET_KEY'])
+                if payload.get('confirm') != current_user.id:
+                     return (current_user.confirmed == False,
+                redirect(url_for('main.landing'))
+                )
+                else:
+                    current_user.confirmed == True
+                    db.session.add(current_user)
+                    db.session.commit()
+                    flash('You have successfully confirmed your account', category='success')
+                    return redirect(url_for('main.index'))
+            except:
+                return flash('Invalid token or token has already expired', category='danger')
+        return decorated
+    return token_required
+
+
+@auth.route('/confirm',methods=['GET','POST'])
 @login_required
-@confirm_token
-def confirm(payload):
+@confirmation_token()
+def confirm():
     if current_user.confirmed:
         return redirect(url_for('main.index'))
-    if payload.get('confirm')!=current_user.id:
-                return current_user.confirmed==False
-    else:
-        current_user.confirmed==True
-        db.session.add(current_user)
-        db.session.commit()
-        flash('You have successfully confirmed your account',category='success')            
-        return redirect(url_for('main.index'))
-    return redirect(url_for('main.landing'))
+    
 @auth.route('/logout')
 @login_required
 def logout():
     logout_user()
-    flash('You have been Signed Out!',category='info')
+    flash('You have been Signed Out!', category='info')
     return redirect(url_for('auth.login'))
-    
