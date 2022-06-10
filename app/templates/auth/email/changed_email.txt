@@ -1,0 +1,13 @@
+Dear {{user}},
+
+Welcome to Blogvolution!
+
+To confirm your email please click on the following link:
+{{url_for('auth.confirm',token=token,_external=True)}}
+
+
+Sincerely,
+
+The Blogvolution Team
+
+Note:replies to this email are not monitored.
