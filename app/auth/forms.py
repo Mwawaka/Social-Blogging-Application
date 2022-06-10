@@ -27,3 +27,8 @@ class ChangePassword(FlaskForm):
     old_password=PasswordField(label='Current Password :',validators=[DataRequired()])
     new_password=PasswordField(label='New Password',validators=[DataRequired(),Length(min=6)])
     submit=SubmitField(label='Change Password')
+
+class ChangeEmail(FlaskForm):
+    old_email=PasswordField(label='Current Email :',validators=[DataRequired()])
+    new_email=PasswordField(label='New Email',validators=[DataRequired(),Email()])
+    submit=SubmitField(label='Change Email')
