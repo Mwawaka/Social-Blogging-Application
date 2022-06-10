@@ -6,13 +6,17 @@ from app.models import User
 from app import db
 from app.emails import send_email
 
-#registers a function to run before each request 
+# registers a function to run before each request
+
+
 @auth.before_app_request
 def before_request():
-    if current_user.is_authenticated and not current_user.confirmed and request.blueprint!='auth' and request.endpoint!='static':
+    if current_user.is_authenticated and not current_user.confirmed and request.blueprint != 'auth' and request.endpoint != 'static':
         return redirect(url_for('auth.unconfirmed'))
- 
-#Deals with users who have not confirmed their accounts   
+
+# Deals with users who have not confirmed their accounts
+
+
 @auth.route('/unconfirmed')
 def unconfirmed():
     if current_user.is_anonymous or current_user.confirmed:
@@ -20,7 +24,7 @@ def unconfirmed():
     return render_template('auth/unconfirmed.html')
 
 
-#Registration
+# Registration
 @auth.route('/register', methods=['GET', 'POST'])
 def register():
     form = RegistrationForm()
@@ -46,7 +50,9 @@ def register():
 
     return render_template('auth/register.html', form=form)
 
-#Email that contains confirmation link
+# Email that contains confirmation link
+
+
 @auth.route('/confirm/<token>', methods=['GET', 'POST'])
 @login_required
 def confirm(token):
@@ -66,18 +72,20 @@ def confirm(token):
         flash('Successfully confirmed your account', category='success')
         return redirect(url_for('main.landing'))
 
-#Resending confirmation email    
+# Resending confirmation email
+
+
 @auth.route('/confirm')
 @login_required
 def resend_confirmation_email():
-    token=current_user.generate_confirmation_token()
+    token = current_user.generate_confirmation_token()
     send_email(current_user.email, 'Confirm Your Account',
-                   'auth/email/confirm', new_user=current_user, token=token)
+               'auth/email/confirm', new_user=current_user, token=token)
     flash('A new confirmation email has been sent to you by email', category='info')
     return redirect(url_for('main.index'))
 
 
-#Login 
+# Login
 @auth.route('/login', methods=['GET', 'POST'])
 def login():
     login_form = LoginForm()
@@ -96,16 +104,34 @@ def login():
             #     # The URL in next is validated to make sure it is a relative URL
             #     next = url_for('main.index')
             #     # if next query string is not available user is then redirected to the home page
-            return redirect(url_for('main.index'))
+            return redirect(url_for('main.landing'))
         flash(f'Invalid email or password', category='danger')
 
     return render_template('auth/login.html', login_form=login_form)
-#Changing password
-@auth.route('/change_password')
+
+
+# Changing password
+@auth.route('/change_password', methods=['GET', 'POST'])
 def change_password():
-    change_password=ChangePassword()
-    return render_template('auth/change_password.html',change_password=change_password)
-#login out
+    change_password = ChangePassword()
+    if change_password.validate_on_submit():
+        if current_user.verify_password(change_password.old_password.data):
+            current_user.password = change_password.new_password.data
+            db.session.add(current_user)
+            db.session.commit()
+            flash('Successfully changed your password', category='success')
+            return redirect(url_for('main.landing'))
+        else:
+            flash('Invalid Password!', category='success')
+
+    return render_template('auth/change_password.html', change_password=change_password)
+
+
+#Changing Email
+@auth.route('/change_email')
+
+
+# login out
 @auth.route('/logout')
 @login_required
 def logout():
