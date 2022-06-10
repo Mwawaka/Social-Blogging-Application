@@ -128,14 +128,16 @@ def change_password():
 
 
 #Changing Email
+# Requires a confirmation Token
 @auth.route('/change_email',methods=['GET','POST'])
 def change_email():
     change_email=ChangeEmail()
     if change_email.validate_on_submit():
         if current_user.verify_email(change_email.old_email.data):
-            current_user.email=change_email.new_email.data
-            db.session.add(current_user)
-            db.session.commit()
+            new_email=change_email.new_email.data.lower()
+            token=current_user.generate_confirmation_token(new_email)
+            send_email(new_email,'Confirm your new email ','auth/email/changed_email',user=current_user,token=token)
+            flash('An email containing a confirmation link has been send to your mailtrap address',category='success')
             
     return render_template('auth/change_email.html',change_email=change_email)
 
