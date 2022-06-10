@@ -1,7 +1,7 @@
 from flask import current_app, flash, jsonify, redirect, render_template, url_for, request
 from flask_login import current_user, login_required, login_user, logout_user
 from app.auth import auth
-from .forms import ChangePassword, LoginForm, RegistrationForm
+from .forms import ChangeEmail, ChangePassword, LoginForm, RegistrationForm
 from app.models import User
 from app import db
 from app.emails import send_email
@@ -128,7 +128,16 @@ def change_password():
 
 
 #Changing Email
-@auth.route('/change_email')
+@auth.route('/change_email',methods=['GET','POST'])
+def change_email():
+    change_email=ChangeEmail()
+    if change_email.validate_on_submit():
+        if current_user.verify_email(change_email.old_email.data):
+            current_user.email=change_email.new_email.data
+            db.session.add(current_user)
+            db.session.commit()
+            
+    return render_template('auth/change_email.html',change_email=change_email)
 
 
 # login out

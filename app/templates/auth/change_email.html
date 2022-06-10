@@ -1,0 +1,24 @@
+{% extends 'base.html' %}
+
+{% block title %}
+    |Change Password
+{% endblock title %}
+
+{% block content %}
+<div class='text-center'>
+    <form method='POST'>
+        {{change_email.hidden_tag()}}
+
+        <div class="mb-3">
+
+            {{change_email.old_email.label()}}
+            {{change_email.old_email(class='form-control',placeholder='Current Email')}}
+
+            {{change_email.new_email.label()}}
+            {{change_email.new_email(class='form-control',placeholder='New Email')}}
+        </div>
+        <br>
+            {{change_email.submit(class="btn btn-primary")}}
+    </form>
+</div>
+{% endblock content %}
