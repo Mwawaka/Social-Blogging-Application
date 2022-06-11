@@ -53,28 +53,24 @@ def register():
 # Email that contains confirmation link
 
 
-@auth.route('/confirm/<token>', methods=['GET', 'POST'])
+@auth.route('/confirm/<token>')
 @login_required
 def confirm(token):
-    try:
-        data = current_user.confirm_token(token)
-    except:
-        flash('The confirmation link is invalid or has expired', category='info')
-        return redirect(url_for('main.index'))
-    if current_user.confirmed:
-        flash('Account has already been confirmed', category='info')
-        return redirect(url_for('main.landing'))
-
-    else:
+    data = current_user.confirm_token(token)
+    if data:
         current_user.confirmed = True
         db.session.add(current_user)
         db.session.commit()
         flash('Successfully confirmed your account', category='success')
+    else:
+        flash('The confirmation link is invalid or has expired', category='danger')
+        return redirect(url_for('auth.unconfirmed'))
+    if current_user.confirmed:
+        flash('Account has already been confirmed', category='info')
         return redirect(url_for('main.landing'))
 
+
 # Resending confirmation email
-
-
 @auth.route('/confirm')
 @login_required
 def resend_confirmation_email():
@@ -112,6 +108,7 @@ def login():
 
 # Changing password
 @auth.route('/change_password', methods=['GET', 'POST'])
+@login_required
 def change_password():
     change_password = ChangePassword()
     if change_password.validate_on_submit():
@@ -127,22 +124,34 @@ def change_password():
     return render_template('auth/change_password.html', change_password=change_password)
 
 
-#Changing Email
+# Changing Email
 # Requires a confirmation Token
-@auth.route('/change_email',methods=['GET','POST'])
-def change_email():
-    change_email=ChangeEmail()
+@auth.route('/change_email', methods=['GET', 'POST'])
+@login_required
+def change_email_request():
+    change_email = ChangeEmail()
     if change_email.validate_on_submit():
-        if current_user.verify_email(change_email.old_email.data):
-            new_email=change_email.new_email.data.lower()
-            token=current_user.generate_confirmation_token(new_email)
-            send_email(new_email,'Confirm your new email ','auth/email/changed_email',user=current_user,token=token)
-            flash('An email containing a confirmation link has been send to your mailtrap address',category='success')
-            
-    return render_template('auth/change_email.html',change_email=change_email)
+        if current_user.verify_password(change_email.old_email.data):
+            new_email = change_email.new_email.data.lower()
+            token = current_user.generate_confirmation_token(new_email)
+            send_email(new_email, 'Confirm your new email ',
+                       'auth/email/changed_email', user=current_user, token=token)
+            flash('An email containing a confirmation link has been send to your mailtrap address', category='success')
+            return redirect('main.landing')
+        else:
+            flash('Invalid email or password.', category='danger')
+    return render_template('auth/change_email.html', change_email=change_email)
 
+# Resending a confirmation email
+
+
+@auth.route('/change_email/<token>')
+def change_email(token):
+    pass
 
 # login out
+
+
 @auth.route('/logout')
 @login_required
 def logout():
