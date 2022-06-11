@@ -2,7 +2,6 @@ from flask import current_app
 from app import db, bcrypt
 from flask_login import UserMixin
 from app import login_manager
-from datetime import datetime, timedelta
 from itsdangerous import URLSafeTimedSerializer as Serializer
 
 
@@ -39,26 +38,43 @@ class User(db.Model, UserMixin):
     def verify_password(self, login_password):
         return bcrypt.check_password_hash(self.password_hash, login_password)
 
+    #Registration
     # Token authentication using URLSafeTimedSerializer
     # Generates the token
 
     def generate_confirmation_token(self):
-        s = Serializer(current_app.config['SECRET_KEY'])
+        s = Serializer(current_app.config['SECRET_KEY'],salt=current_app.config['SECURITY_PASSWORD_SALT'])
         return s.dumps({'confirm': self.id}, salt=current_app.config['SECURITY_PASSWORD_SALT'])
 
     # Confirms the token
     def confirm_token(token, expiration=3600):
-        s = Serializer(current_app.config['SECRET_KEY'])
+        s = Serializer(current_app.config['SECRET_KEY'],salt=current_app.config['SECURITY_PASSWORD_SALT'])
         try:
             data = s.loads(
                 token,
-                salt=current_app.config['SECURITY_PASSWORD_KEY'],
-                max_age=expiration
+                max_age=expiration,
+                salt=current_app.config['SECURITY_PASSWORD_KEY']
+                
             )
         except:
             return False
         return data
-
+    
+    # def generate_change_email_token(self,new_email):
+    #     s=Serializer(current_app.config['SECRET_KEY'])
+    #     return s.dumps({'change_email':self.id,'new_email':new_email},salt=current_app.config['SECURITY_PASSWORD_SALT']).decode('utf-8')
+    
+    # def confirm_email_token(token,self,expiration=3600):
+    #     s=Serializer(current_app.config['SECRET_KEY'])
+    #     try:
+    #         data=s.loads(
+    #             token.encode('utf-8'),
+    #             salt=current_app.config['SECURITY_PASSWORD_SALT'],
+    #             max_age=expiration
+    #         )
+    #     except:
+    #         return False
+    #     return data
     def __repr__(self):
         return f'User {self.username}'
 
