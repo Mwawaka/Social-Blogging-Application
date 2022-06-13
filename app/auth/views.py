@@ -1,5 +1,6 @@
 from flask import current_app, flash, jsonify, redirect, render_template, url_for, request
 from flask_login import current_user, login_required, login_user, logout_user
+from itsdangerous import BadSignature, Serializer, SignatureExpired
 from app.auth import auth
 from .forms import ChangeEmail, ChangePassword, LoginForm, RegistrationForm
 from app.models import User
@@ -56,18 +57,25 @@ def register():
 @auth.route('/confirm/<token>')
 @login_required
 def confirm(token):
-    data = current_user.confirm_token(token)
-    if data:
-        current_user.confirmed = True
-        db.session.add(current_user)
-        db.session.commit()
-        flash('Successfully confirmed your account', category='success')
-    else:
-        flash('The confirmation link is invalid or has expired', category='danger')
-        return redirect(url_for('auth.unconfirmed'))
     if current_user.confirmed:
-        flash('Account has already been confirmed', category='info')
+        flash('Account has already been confirmed',category='success')
         return redirect(url_for('main.landing'))
+    try:
+        
+            data=current_user.confirm_token(token)
+            if data!=current_user.id:
+                flash('The confirmation link is invalid or has already expired',category='info')
+                return redirect(url_for('auth.unconfirmed'))
+            else:
+                db.session.add(current_user)
+                db.session.commit(current_user)
+                flash('You have successfully confirmed your account',category='success')
+                return redirect(url_for('main.landing')) 
+    except :
+       flash('Token is invalid or missing',category='danger')
+       return redirect(url_for('auth.unconfirmed'))
+    
+    
 
 
 # Resending confirmation email
