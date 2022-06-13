@@ -2,7 +2,8 @@ from flask import current_app
 from app import db, bcrypt
 from flask_login import UserMixin
 from app import login_manager
-from itsdangerous import URLSafeTimedSerializer as Serializer
+import jwt
+from datetime import datetime,timedelta
 
 
 # This sets the callback for reloading a user from the session. The function you set should take a user ID (a str) and return a user object, or None if the user does not exist
@@ -43,22 +44,29 @@ class User(db.Model, UserMixin):
     # Generates the token
 
     def generate_confirmation_token(self):
-        s = Serializer(current_app.config['SECRET_KEY'],salt=current_app.config['SECURITY_PASSWORD_SALT'])
-        return s.dumps({'confirm': self.id}, salt=current_app.config['SECURITY_PASSWORD_SALT'])
-
-    # Confirms the token
-    def confirm_token(token, expiration=3600):
-        s = Serializer(current_app.config['SECRET_KEY'],salt=current_app.config['SECURITY_PASSWORD_SALT'])
+        token=jwt.encode(
+            {
+                'confirm':self.id,
+                'expiration':str(datetime.utcnow()+timedelta(minutes=2))
+            },
+            current_app.config['SECRET_KEY'],
+            algorithm='HS256'
+        )
+        return token
+    
+    def confirm_token(self,token):
         try:
-            data = s.loads(
+            payload=jwt.decode(
                 token,
-                max_age=expiration,
-                salt=current_app.config['SECURITY_PASSWORD_KEY']
-                
+                current_app.config['SECRET_KEY'],
+                algorithms=['HS256'],
+                verify_signature=True
             )
-        except:
+           
+        except (jwt.DecodeError,jwt.ExpiredSignatureError):
             return False
-        return data
+        return payload.get('confirm')
+
     
     # def generate_change_email_token(self,new_email):
     #     s=Serializer(current_app.config['SECRET_KEY'])
