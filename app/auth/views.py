@@ -1,6 +1,5 @@
-from flask import current_app, flash, jsonify, redirect, render_template, url_for, request
+from flask import  flash,  redirect, render_template, url_for, request
 from flask_login import current_user, login_required, login_user, logout_user
-from itsdangerous import BadSignature, Serializer, SignatureExpired
 from app.auth import auth
 from .forms import ChangeEmail, ChangePassword, LoginForm, RegistrationForm
 from app.models import User
@@ -83,7 +82,7 @@ def resend_confirmation_email():
     send_email(current_user.email, 'Confirm Your Account',
                'auth/email/confirm', new_user=current_user, token=token)
     flash('A new confirmation email has been sent to you by email', category='info')
-    return redirect(url_for('main.index'))
+    return redirect(url_for('auth.unconfirmed'))
 
 
 # Login
