@@ -54,26 +54,23 @@ def register():
 # Email that contains confirmation link
 
 
-@auth.route('/confirm/<token>')
+@auth.route('/confirm/<token>',methods=['GET','POST'])
 @login_required
 def confirm(token):
     if current_user.confirmed:
         flash('Account has already been confirmed',category='success')
         return redirect(url_for('main.landing'))
-    try:
-        
-            data=current_user.confirm_token(token)
-            if data!=current_user.id:
-                flash('The confirmation link is invalid or has already expired',category='info')
-                return redirect(url_for('auth.unconfirmed'))
-            else:
-                db.session.add(current_user)
-                db.session.commit(current_user)
-                flash('You have successfully confirmed your account',category='success')
-                return redirect(url_for('main.landing')) 
-    except :
-       flash('Token is invalid or missing',category='danger')
-       return redirect(url_for('auth.unconfirmed'))
+    
+    user=User.confirm_token(token)
+    if user is None:
+         flash('The confirmation link is invalid or has already expired',category='info')
+         return redirect(url_for('auth.unconfirmed'))
+    user.confirmed=True 
+    db.session.add(user)
+    db.session.commit()
+    flash('You have successfully confirmed your account',category='success')
+    return redirect(url_for('main.landing')) 
+   
     
     
 
