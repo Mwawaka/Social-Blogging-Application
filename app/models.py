@@ -54,18 +54,19 @@ class User(db.Model, UserMixin):
         )
         return token
     
-    def confirm_token(self,token):
+    @staticmethod
+    def confirm_token(token):
         try:
             payload=jwt.decode(
                 token,
                 current_app.config['SECRET_KEY'],
-                algorithms=['HS256'],
-                verify_signature=True
+                algorithms=['HS256']
             )
            
         except (jwt.DecodeError,jwt.ExpiredSignatureError):
-            return False
-        return payload.get('confirm')
+            return None
+        id=payload.get('confirm')
+        return User.query.get(id) #returns the user with the id specified
 
     
     # def generate_change_email_token(self,new_email):
