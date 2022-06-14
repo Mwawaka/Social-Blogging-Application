@@ -3,7 +3,7 @@ from app import db, bcrypt
 from flask_login import UserMixin
 from app import login_manager
 import jwt
-from datetime import datetime,timedelta
+import datetime
 
 
 # This sets the callback for reloading a user from the session. The function you set should take a user ID (a str) and return a user object, or None if the user does not exist
@@ -39,40 +39,40 @@ class User(db.Model, UserMixin):
     def verify_password(self, login_password):
         return bcrypt.check_password_hash(self.password_hash, login_password)
 
-    #Registration
+    # Registration
     # Token authentication using URLSafeTimedSerializer
     # Generates the token
 
     def generate_confirmation_token(self):
-        token=jwt.encode(
+        token = jwt.encode(
             {
-                'confirm':self.id,
-                'expiration':str(datetime.utcnow()+timedelta(minutes=2))
+                'confirm': self.id,
+                'expiration': str(datetime.datetime.utcnow()+datetime.timedelta(minutes=2))
             },
             current_app.config['SECRET_KEY'],
             algorithm='HS256'
         )
         return token
-    
+
     @staticmethod
     def confirm_token(token):
         try:
-            payload=jwt.decode(
+            payload = jwt.decode(
                 token,
                 current_app.config['SECRET_KEY'],
                 algorithms=['HS256']
             )
-           
-        except (jwt.DecodeError,jwt.ExpiredSignatureError):
-            return None
-        id=payload.get('confirm')
-        return User.query.get(id) #returns the user with the id specified
 
-    
+        except (jwt.DecodeError, jwt.ExpiredSignatureError):
+            return None
+        id = payload.get('confirm')
+        # returns the user with the id specified in the database
+        return User.query.get(id)
+
     # def generate_change_email_token(self,new_email):
     #     s=Serializer(current_app.config['SECRET_KEY'])
     #     return s.dumps({'change_email':self.id,'new_email':new_email},salt=current_app.config['SECURITY_PASSWORD_SALT']).decode('utf-8')
-    
+
     # def confirm_email_token(token,self,expiration=3600):
     #     s=Serializer(current_app.config['SECRET_KEY'])
     #     try:
@@ -84,6 +84,7 @@ class User(db.Model, UserMixin):
     #     except:
     #         return False
     #     return data
+
     def __repr__(self):
         return f'User {self.username}'
 
