@@ -68,23 +68,8 @@ class User(db.Model, UserMixin):
         id = payload.get('confirm')
         # returns the user with the id specified in the database
         return User.query.get(id)
-
-    # def generate_change_email_token(self,new_email):
-    #     s=Serializer(current_app.config['SECRET_KEY'])
-    #     return s.dumps({'change_email':self.id,'new_email':new_email},salt=current_app.config['SECURITY_PASSWORD_SALT']).decode('utf-8')
-
-    # def confirm_email_token(token,self,expiration=3600):
-    #     s=Serializer(current_app.config['SECRET_KEY'])
-    #     try:
-    #         data=s.loads(
-    #             token.encode('utf-8'),
-    #             salt=current_app.config['SECURITY_PASSWORD_SALT'],
-    #             max_age=expiration
-    #         )
-    #     except:
-    #         return False
-    #     return data
-
+    
+    
     def __repr__(self):
         return f'User {self.username}'
 
