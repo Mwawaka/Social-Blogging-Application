@@ -1,6 +1,3 @@
-from crypt import methods
-from curses import reset_shell_mode
-from re import I
 from flask import flash,  redirect, render_template, url_for, request
 from flask_login import current_user, login_required, login_user, logout_user
 from app.auth import auth
@@ -10,8 +7,6 @@ from app import db
 from app.emails import send_email
 
 # registers a function to run before each request
-
-
 @auth.before_app_request
 def before_request():
     if current_user.is_authenticated and not current_user.confirmed and request.blueprint != 'auth' and request.endpoint != 'static':
@@ -43,7 +38,6 @@ def register():
         send_email(new_user.email, 'Confirm Your Account',
                    'auth/email/confirm', new_user=new_user, token=token)
         flash('A confirmation email has been sent to you by email', category='info')
-        # flash('Successfully registered.You can now Sign In!', category='success')
         return redirect(url_for('auth.login'))
     if form.errors != {}:
         for err_msg in form.errors.values():
@@ -97,12 +91,6 @@ def login():
 
             flash(
                 f'You have successfull signed in as :{user.username}', category='success')
-            # next = request.args.get('next')
-            # # the original url protected from unauthorized access is stored in next query string
-            # if next is None or not next.startswith('/'):
-            #     # The URL in next is validated to make sure it is a relative URL
-            #     next = url_for('main.index')
-            #     # if next query string is not available user is then redirected to the home page
             return redirect(url_for('main.landing'))
         flash(f'Invalid email or password', category='danger')
 
@@ -176,6 +164,7 @@ def reset_password_request():
             return redirect(url_for('auth.login'))
     return render_template('auth/reset_password.html', reset_form=reset_form)
 
+
 # Route that handles reset password token
 @auth.route('/reset_password/<token>', methods=['GET', 'POST'])
 def reset_password(token):
@@ -183,19 +172,16 @@ def reset_password(token):
     if user is None:
         flash('The confirmation link is invalid or has expired', category='danger')
         return redirect(url_for('main.landing'))
-    if not user.is_anonymous:
+    if not current_user.is_anonymous:
         return redirect(url_for('main.landing'))
     reset = PasswordResetForm()
     if reset.validate_on_submit():
-        user.password=reset.password1.data
+        user.password = reset.password1.data
         db.session.add(user)
         db.session.commit()
-        flash('Your password has been updated',category='success')
+        flash('Your password has been updated', category='success')
         return redirect(url_for('auth.login'))
-    else:
-        flash('Invalid email or password',category='danger')
-    return render_template('auth/reset_password.html',reset=reset)        
-      
+    return render_template('auth/reset.html', reset=reset)
 
 # login out
 @auth.route('/logout')
