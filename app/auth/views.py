@@ -174,7 +174,7 @@ def reset_password_request():
                        'auth/email/password_reset', user=user, token=token)
             flash('An email containing a reset instructions has been send to your mailtrap address', category='success')
             return redirect(url_for('auth.login'))
-        return render_template('auth/reset_password.html', reset_form=reset_form)
+    return render_template('auth/reset_password.html', reset_form=reset_form)
 
 # Route that handles reset password token
 @auth.route('/reset_password/<token>', methods=['GET', 'POST'])
