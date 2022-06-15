@@ -48,3 +48,8 @@ class ChangeEmail(FlaskForm):
         user=User.query.filter_by(email=field.data).first()
         if user:
                 raise ValidationError('Email already exist!Please try a different one')
+class PasswordReset(FlaskForm):
+    email=EmailField(label='Email Address :',validators=[DataRequired(),Email()])
+    password1=PasswordField(label='Password :',validators=[Length(min=6),DataRequired()])
+    password2=PasswordField(label='Password :',validators=[DataRequired(),EqualTo('password1')])
+    submit=SubmitField(label='Reset')
