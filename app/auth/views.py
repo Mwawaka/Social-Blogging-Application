@@ -1,7 +1,8 @@
+from re import I
 from flask import  flash,  redirect, render_template, url_for, request
 from flask_login import current_user, login_required, login_user, logout_user
 from app.auth import auth
-from .forms import ChangeEmail, ChangePassword, LoginForm, RegistrationForm
+from .forms import ChangeEmail, ChangePassword, LoginForm, PasswordResetRequestForm, RegistrationForm,PasswordReset
 from app.models import User
 from app import db
 from app.emails import send_email
@@ -147,9 +148,9 @@ def change_email_request():
             flash('Invalid email or password.', category='danger')
     return render_template('auth/change_email.html', change_email=change_email)
 
-# Resending a confirmation email
 
 
+# route that handles the change email token
 @auth.route('/change_email/<token>',methods=['GET','POST'])
 def change_email(token):
     email,user=User.confirm_email_token(token)
@@ -162,9 +163,14 @@ def change_email(token):
     flash('Email has successfully been changed.',category='success')
     return redirect(url_for('main.landing'))
 
+#Request for password reset
+@auth.route('/reset_password')
+def reset_password_request():
+  reset_form=PasswordResetRequestForm()
+  if reset_form.validate_on_submit():
+    pass
+  return render_template('auth/reset_password.html',reset_form=reset_form)    
 # login out
-
-
 @auth.route('/logout')
 @login_required
 def logout():
