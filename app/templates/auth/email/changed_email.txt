@@ -3,7 +3,7 @@ Dear {{user}},
 Welcome to Blogvolution!
 
 To confirm your email please click on the following link:
-{{url_for('auth.confirm',token=token,_external=True)}}
+{{url_for('auth.change_email',token=token,_external=True)}}
 
 
 Sincerely,
