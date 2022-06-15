@@ -40,6 +40,11 @@ class ChangePassword(FlaskForm):
     submit=SubmitField(label='Change Password')
 
 class ChangeEmail(FlaskForm):
-    old_email=PasswordField(label='Current Email :',validators=[DataRequired()])
-    new_email=PasswordField(label='New Email',validators=[DataRequired(),Email()])
+    new_email=EmailField(label='New Email :',validators=[DataRequired(),Email()])
+    password=PasswordField(label='Password :',validators=[DataRequired()])
     submit=SubmitField(label='Change Email')
+    
+    def validate_email(self, field):
+        user=User.query.filter_by(email=field.data).first()
+        if user:
+                raise ValidationError('Email already exist!Please try a different one')
