@@ -14,9 +14,9 @@ def before_request():
     if current_user.is_authenticated and not current_user.confirmed and request.blueprint != 'auth' and request.endpoint != 'static':
         return redirect(url_for('auth.unconfirmed'))
 
-# Deals with users who have not confirmed their accounts
 
 
+# Route that deals with users who have not confirmed their accounts
 @auth.route('/unconfirmed')
 def unconfirmed():
     if current_user.is_anonymous or current_user.confirmed:
@@ -50,9 +50,9 @@ def register():
 
     return render_template('auth/register.html', form=form)
 
-# Email that contains confirmation link
 
 
+#route to hanlde account confirmation
 @auth.route('/confirm/<token>',methods=['GET','POST'])
 @login_required
 def confirm(token):
@@ -83,6 +83,7 @@ def resend_confirmation_email():
                'auth/email/confirm', new_user=current_user, token=token)
     flash('A new confirmation email has been sent to you by email', category='info')
     return redirect(url_for('auth.unconfirmed'))
+
 
 
 # Login
@@ -135,13 +136,13 @@ def change_password():
 def change_email_request():
     change_email = ChangeEmail()
     if change_email.validate_on_submit():
-        if current_user.verify_password(change_email.old_email.data):
-            new_email = change_email.new_email.data.lower()
-            token = current_user.generate_confirmation_token(new_email)
+        if current_user.verify_password(change_email.password.data):
+            new_email = change_email.new_email.data
+            token = current_user.confirmation_email_token(new_email)
             send_email(new_email, 'Confirm your new email ',
                        'auth/email/changed_email', user=current_user, token=token)
             flash('An email containing a confirmation link has been send to your mailtrap address', category='success')
-            return redirect('main.landing')
+            return redirect(url_for('main.landing'))
         else:
             flash('Invalid email or password.', category='danger')
     return render_template('auth/change_email.html', change_email=change_email)
@@ -149,9 +150,17 @@ def change_email_request():
 # Resending a confirmation email
 
 
-@auth.route('/change_email/<token>')
+@auth.route('/change_email/<token>',methods=['GET','POST'])
 def change_email(token):
-    pass
+    email,user=User.confirm_email_token(token)
+    if user is None:
+        flash('The confirmation link is invalid or has expired',category='danger')
+        return redirect(url_for('main.landing'))
+    user.email=email
+    db.session.add(user)
+    db.session.commit()
+    flash('Email has successfully been changed.',category='success')
+    return redirect(url_for('main.landing'))
 
 # login out
 
