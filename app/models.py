@@ -73,16 +73,17 @@ class User(db.Model, UserMixin):
         return User.query.get(id)
 
     # Token for the new email
+
     def confirmation_email_token(self, new_email):
         token = jwt.encode(
             {
-                'change_email':self.id,
-                'email':new_email,
-                'expiration':str(datetime.utcnow() + timedelta(minutes=3))
+                'change_email': self.id,
+                'email': new_email,
+                'expiration': str(datetime.utcnow() + timedelta(minutes=3))
             },
             current_app.config['SECRET_KEY'],
             algorithm='HS256'
-         
+
         )
         return token
 
@@ -96,9 +97,19 @@ class User(db.Model, UserMixin):
             )
         except (jwt.DecodeError, jwt.ExpiredSignatureError):
             return None
-        id=payload.get('change_email')
+        id = payload.get('change_email')
         email = payload.get('email')
-        return (email,User.query.get(id))
+        return (email, User.query.get(id))
+    
+    #Token for reset password
+    def reset_password_token(self):
+        token=jwt.encode(
+            {
+                'expiration':str(datetime.utcnow() + timedelta(minutes=3))
+            },
+            current_app.config['SECRET_KEY'],
+            algorithm='HS256'
+        )
 
     def __repr__(self):
         return f'User {self.username}'
