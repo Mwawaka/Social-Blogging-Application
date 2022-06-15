@@ -105,11 +105,25 @@ class User(db.Model, UserMixin):
     def reset_password_token(self):
         token=jwt.encode(
             {
+                'reset':self.id,
                 'expiration':str(datetime.utcnow() + timedelta(minutes=3))
             },
             current_app.config['SECRET_KEY'],
             algorithm='HS256'
         )
+        return token
+    @staticmethod
+    def confirm_reset_token(token):
+        try:
+            payload=jwt.decode(
+                token,
+                current_app.config['SECRET_KEY'],
+                algorithms=['HS256']
+            )
+        except (jwt.DecodeError,jwt.ExpiredSignatureError):
+            return None
+        id=payload.get('reset')  
+        return User.query.get(id)
 
     def __repr__(self):
         return f'User {self.username}'
