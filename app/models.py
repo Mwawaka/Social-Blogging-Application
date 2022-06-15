@@ -1,12 +1,15 @@
+from distutils.command.config import config
+from lib2to3.pgen2 import token
 from flask import current_app
 from app import db, bcrypt
 from flask_login import UserMixin
 from app import login_manager
 import jwt
-import datetime
-
+from datetime import datetime, timedelta
 
 # This sets the callback for reloading a user from the session. The function you set should take a user ID (a str) and return a user object, or None if the user does not exist
+
+
 @login_manager.user_loader
 def load_user(user_id):
     return User.query.get(int(user_id))
@@ -47,7 +50,7 @@ class User(db.Model, UserMixin):
         token = jwt.encode(
             {
                 'confirm': self.id,
-                'expiration': str(datetime.datetime.utcnow()+datetime.timedelta(minutes=2))
+                'expiration': str(datetime.utcnow() + timedelta(minutes=2))
             },
             current_app.config['SECRET_KEY'],
             algorithm='HS256'
@@ -68,8 +71,35 @@ class User(db.Model, UserMixin):
         id = payload.get('confirm')
         # returns the user with the id specified in the database
         return User.query.get(id)
-    
-    
+
+    # Token for the new email
+    def confirmation_email_token(self, new_email):
+        token = jwt.encode(
+            {
+                'change_email':self.id,
+                'email':new_email,
+                'expiration':str(datetime.utcnow() + timedelta(minutes=3))
+            },
+            current_app.config['SECRET_KEY'],
+            algorithm='HS256'
+         
+        )
+        return token
+
+    @staticmethod
+    def confirm_email_token(token):
+        try:
+            payload = jwt.decode(
+                token,
+                current_app.config['SECRET_KEY'],
+                algorithms=['HS256']
+            )
+        except (jwt.DecodeError, jwt.ExpiredSignatureError):
+            return None
+        id=payload.get('change_email')
+        email = payload.get('email')
+        return (email,User.query.get(id))
+
     def __repr__(self):
         return f'User {self.username}'
 
