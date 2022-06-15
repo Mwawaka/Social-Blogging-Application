@@ -1,5 +1,4 @@
-from distutils.command.config import config
-from lib2to3.pgen2 import token
+
 from flask import current_app
 from app import db, bcrypt
 from flask_login import UserMixin
