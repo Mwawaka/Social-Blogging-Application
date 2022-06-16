@@ -1,6 +1,7 @@
+from email.policy import default
 from flask import current_app
 from app import db, bcrypt
-from flask_login import UserMixin
+from flask_login import AnonymousUserMixin, UserMixin
 from app import login_manager
 import jwt
 from datetime import datetime, timedelta
@@ -26,12 +27,39 @@ class User(db.Model, UserMixin):
     id = db.Column(db.Integer(), primary_key=True)
     username = db.Column(db.String(length=30), nullable=False,
                          unique=True, index=True)
+    name=db.Column(db.String(length=30),nullable=False)
+    location=db.Column(db.String(length=60),nullable=False)
+    about_me=db.Column(db.Text())
+    member_since=db.Column(db.DateTime(),default=datetime.utcnow)
+    last_seen=db.Column(db.DateTime(),default=datetime.utcnow)
     email = db.Column(db.String(length=60), nullable=False,
                       unique=True, index=True)
     password_hash = db.Column(db.String(length=128), nullable=False)
     role_id = db.Column(db.Integer(), db.ForeignKey('roles.id'))
     confirmed = db.Column(db.Boolean(), nullable=False, default=False)
 
+    # Admin role assignment
+    def __init__(self, **kwargs):
+        super(User, self).__init__(**kwargs)
+        if self.role is None:
+            if self.email == current_app.config['FLASKY_ADMIN']:
+                self.role = Role.query.filter_by(name='Admin').first()
+            if self.role is None:
+                self.role = Role.query.filter_by(default=True).first()
+
+    # Role Verification
+    def can(self, perm):
+        return self is not None and self.role.has_permission(perm)  # True
+
+    def is_admin(self):
+        return self.can(Permission.ADMIN)
+
+    #updates user's last_seen
+    def ping(self):
+        self.last_seen=datetime.utcnow()
+        db.session.add(self)
+        db.session.commit()
+    
     # Password encryption
     @property
     def password(self):
@@ -167,22 +195,34 @@ class Role(db.Model):
 
     @staticmethod
     def insert_roles():
-        roles={
-            'User':[Permission.FOLLOW,Permission.COMMENT,Permission.WRITE],
-            'Moderator':[Permission.FOLLOW,Permission.COMMENT,Permission.WRITE,Permission.MODERATE],
-            'Admin':[Permission.FOLLOW,Permission.COMMENT,Permission.WRITE,Permission.MODERATE,Permission.ADMIN]
+        roles = {
+            'User': [Permission.FOLLOW, Permission.COMMENT, Permission.WRITE],
+            'Moderator': [Permission.FOLLOW, Permission.COMMENT, Permission.WRITE, Permission.MODERATE],
+            'Admin': [Permission.FOLLOW, Permission.COMMENT, Permission.WRITE, Permission.MODERATE, Permission.ADMIN]
         }
-        default_role='User'
+        default_role = 'User'
         for r in roles:
-            role=Role.query.filter_by(name=r).first()
+            role = Role.query.filter_by(name=r).first()
             if role is None:
-                role=Role(name=r)
+                role = Role(name=r)
             role.reset_permission()
             for perm in roles[r]:
                 role.add_permission(perm)
-            role.default=(role.name==default_role)
+            role.default = (role.name == default_role)
             db.session.add(role)
         db.session.commit()
+
     def __repr__(self):
         return f'Role {self.name}'
 # index-ensures that queries are more efficient
+
+
+class AnonymousUser(AnonymousUserMixin):
+    def can(self, permissions):
+        return False
+
+    def is_admin(self):
+        return False
+
+
+login_manager.anonymous_user = AnonymousUser
