@@ -27,8 +27,8 @@ class User(db.Model, UserMixin):
     id = db.Column(db.Integer(), primary_key=True)
     username = db.Column(db.String(length=30), nullable=False,
                          unique=True, index=True)
-    name=db.Column(db.String(length=30),nullable=False)
-    location=db.Column(db.String(length=60),nullable=False)
+    name=db.Column(db.String(length=30))
+    location=db.Column(db.String(length=60))
     about_me=db.Column(db.Text())
     member_since=db.Column(db.DateTime(),default=datetime.utcnow)
     last_seen=db.Column(db.DateTime(),default=datetime.utcnow)
